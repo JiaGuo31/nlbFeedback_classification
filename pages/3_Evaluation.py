@@ -17,9 +17,9 @@ if 'test_data' not in st.session_state:
                                             usecols=["Category","Sub Category","Cleaned Text"]).dropna()
 
 if 'validation_subcat' not in st.session_state:
-    st.session_state.validation_subcat, st.session_state.validation_cat = cleaning_output.validate(st.session_state.test_data)
-# validation_results = pd.read_csv("test_data_and_functions/validation_results.csv")
-# validation_cat = validation_results.drop_duplicates(["Cleaned Text", "Category", "correct_cat_flag"])
+    # st.session_state.validation_subcat, st.session_state.validation_cat = cleaning_output.validate(st.session_state.test_data)
+    st.session_state.validation_subcat = pd.read_csv("test_data_and_functions/validation_results.csv")
+    st.session_state.validation_cat = st.session_state.validation_subcat.drop_duplicates(["Cleaned Text", "Category", "correct_cat_flag"])
 
 if st.session_state.test_data is not None and not st.session_state.test_data.empty:
     # Display the data in an interactive table

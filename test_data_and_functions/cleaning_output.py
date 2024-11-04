@@ -66,6 +66,7 @@ def validate(test_data):
 
 if __name__ == "__main__":
     # read test data
-    test_data = pd.read_csv("test_data_and_functions/Composite test set for all categories.csv")
+    test_data = pd.read_csv("test_data_and_functions/Composite test set for all categories.csv", 
+                            usecols=["Category","Sub Category","Cleaned Text"]).dropna()
     validation_subcat, validation_cat = validate(test_data)
     validation_subcat.to_csv("test_data_and_functions/validation_results.csv")
