@@ -28,7 +28,6 @@ st.set_page_config(
 # endregion <--------- Streamlit App Configuration --------->
 
 
-
 # try catch Cloak API
 if 'df_cloak_available' not in st.session_state:
     try:
@@ -257,3 +256,14 @@ if form.form_submit_button("Submit"):
                 st.pyplot(plt)
             except:
                 st.write("WordCloud could not be generated")
+
+with st.expander("DISCLAIMER"):
+    st.markdown("""
+
+                IMPORTANT NOTICE: This web application is developed as a proof-of-concept prototype. The information provided here is NOT intended for actual usage and should not be relied upon for making any decisions, especially those related to financial, legal, or healthcare matters.
+
+                Furthermore, please be aware that the LLM may generate inaccurate or incorrect information. You assume full responsibility for how you use any generated output.
+
+                Always consult with qualified professionals for accurate and personalized advice.
+
+                """)
