@@ -88,7 +88,8 @@ form = st.form(key="form")
 user_prompt = form.text_area("Enter your feeback here, you can copy multiple feedback from excel and paste it here. Records will be split by double quotes or new line.", height=400)
 
 if form.form_submit_button("Submit"):
-    st.session_state.df_feedback = pd.DataFrame() 
+    st.session_state.df_feedback = pd.DataFrame()
+    st.session_state.df_feedback_unknown = pd.DataFrame()  
     st.session_state.record_ctr = 0   
     st.toast(f"User Input Submitted - {user_prompt}")
     check_malicious = feedback_class.check_for_malicious_intent(user_prompt)
@@ -144,40 +145,46 @@ if form.form_submit_button("Submit"):
                 # df = pd.DataFrame(response_json['feedback_data'])
                 df = pd.DataFrame(response)
                 df['feedback'] = record
+                df['feedback_no.'] = st.session_state.record_ctr
                 
                 if(len(df) > 0):
-
-                    if(len(st.session_state.df_feedback) > 0):
-                        st.session_state.df_feedback = pd.concat([st.session_state.df_feedback, df], ignore_index=True)
-                        
-                    else: 
-                        st.session_state.df_feedback = df
+                    pass 
                 else:
-                    
-                    df = pd.DataFrame({"category":[""],"subcategory":[""], "keywords": [[]], "feedback":record})
-                    if(len(st.session_state.df_feedback) > 0):  
-                        st.session_state.df_feedback = pd.concat([st.session_state.df_feedback, df], ignore_index=True)
+                    df = pd.DataFrame({"category":[""],"subcategory":[""], "keywords": [[]], "feedback":record, 
+                                       "feedback_no.": st.session_state.record_ctr })
+                    if(len(st.session_state.df_feedback_unknown) > 0):  
+                        st.session_state.df_feedback_unknown = pd.concat([st.session_state.df_feedback_unknown, df], ignore_index=True)
                     else:
-                        st.session_state.df_feedback = df
-            except: 
-                # if there was a different response from LLM, e.g. not in json format, empty value,
-                # add the feedback to another dataframe
-
-                df = pd.DataFrame({"category":[""],"subcategory":[""], "keywords": [[]], "feedback":record})
+                        st.session_state.df_feedback_unknown = df
 
                 if(len(st.session_state.df_feedback) > 0):  
                     st.session_state.df_feedback = pd.concat([st.session_state.df_feedback, df], ignore_index=True)
                 else:
                     st.session_state.df_feedback = df
+            except: 
+                # if there was a different response from LLM, e.g. not in json format, empty value,
+                # add the feedback to another dataframe
+
+                df = pd.DataFrame({"category":[""],"subcategory":[""], "keywords": [[]], "feedback":record, 
+                                   "feedback_no.": st.session_state.record_ctr })
+
+                if(len(st.session_state.df_feedback) > 0):  
+                    st.session_state.df_feedback = pd.concat([st.session_state.df_feedback, df], ignore_index=True)
+                else:
+                    st.session_state.df_feedback = df
+                if(len(st.session_state.df_feedback_unknown) > 0):  
+                    st.session_state.df_feedback_unknown = pd.concat([st.session_state.df_feedback_unknown, df], ignore_index=True)
+                else:
+                    st.session_state.df_feedback_unknown = df
         
         st.success("Process completed!")
         total_time = int(time.time() - start_time)
         st.write(f"Total Duration: {total_time} seconds")
 
-        # st.markdown(f"""
-        #                     | :blue[No of Feedback Processed] | :red[No of Feedback without Category]    |
-        #                     |-----------------------------------|------------------------------------------|
-        #                     | {st.session_state.record_ctr}        |  {len(st.session_state.df_feedback_unknown)} |""")
+        st.markdown(f"""
+                            | :blue[No of Feedback Processed] | :red[No of Feedback without Category]    |
+                            |-----------------------------------|------------------------------------------|
+                            | {st.session_state.record_ctr}        |  {len(st.session_state.df_feedback_unknown)} |""")
         
         @st.cache_data
         def convert_df(df):
